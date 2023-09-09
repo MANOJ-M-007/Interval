@@ -133,10 +133,17 @@ const List = () => {
   const handlePriorityFilterChange = (event) => {
     setPriorityFilter(event.target.value);
   };
+
   const filteredTasks =
     priorityFilter === "All"
-      ? tasks 
+      ? tasks
       : tasks.filter((task) => task.priority === priorityFilter);
+
+  const sortedTasks = filteredTasks.sort((a, b) => {
+    const dateA = new Date(`${a.date}T${a.time}`);
+    const dateB = new Date(`${b.date}T${b.time}`);
+    return dateB - dateA; // Compare in descending order for last added first
+  });
   useEffect(() => {
     fetchTasks();
   }, [dataUpdated, contextUpdated]);
@@ -303,7 +310,7 @@ const List = () => {
       </Dialog>
 
       {/* Add a button group for priority filter */}
-      
+
       <Typography
         sx={{
           backgroundImage: "linear-gradient(to right, #28536B, #7EA8BE)",
@@ -342,12 +349,12 @@ const List = () => {
               transform: priorityFilter === value ? "scale(1.1)" : "scale(1)",
               transition: "transform 0.2s ease-in-out",
               height: "30px",
-              backgroundColor: priorityFilter === value ? "#000" : "#ddd", 
-              color: priorityFilter === value ? "#fff" : "#000", 
+              backgroundColor: priorityFilter === value ? "#000" : "#ddd",
+              color: priorityFilter === value ? "#fff" : "#000",
               boxShadow:
                 priorityFilter === value
                   ? "1px 2px 5px rgba(67, 68, 82)"
-                  : "none", 
+                  : "none",
             }}
           >
             {value}
@@ -359,7 +366,7 @@ const List = () => {
 
       <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" } }}>
         <Grid container spacing={2}>
-          {filteredTasks.length === 0 ? (
+          {sortedTasks.length === 0 ? (
             <Typography
               sx={{
                 fontFamily: "monospace",
@@ -379,7 +386,7 @@ const List = () => {
                 : `No tasks are available in ${priorityFilter} priority`}{" "}
             </Typography>
           ) : (
-            filteredTasks.map((value) => (
+            sortedTasks.map((value) => (
               <Grid item xs={12} lg={6} key={value.id}>
                 <Card
                   sx={{
